@@ -1,0 +1,423 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8">
+  <title>TugasKu</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f3f3f3;
+      margin: 0;
+      padding: 10px;
+      display: flex;
+      flex-direction: column;
+    }
+
+    body.dark {
+      background: #1e1e1e;
+      color: white;
+    }
+
+    #nav-buttons {
+      text-align: center;
+      margin-bottom: 15px;
+    }
+
+    #nav-buttons button {
+      margin: 0 5px;
+      padding: 10px 15px;
+      background: #1976d2;
+      color: white;
+      border: none;
+      border-radius: 6px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    body.dark #nav-buttons button {
+      background: #2196f3;
+    }
+
+    .main-layout {
+      display: flex;
+      flex-direction: row;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 10px;
+    }
+
+    .container, .schedule-container {
+      background: white;
+      padding: 15px;
+      border-radius: 10px;
+      box-shadow: 0 0 10px rgba(0,0,0,0.1);
+      flex: 1 1 100%;
+    }
+
+    @media (min-width: 768px) {
+      .container { flex: 0 0 60%; }
+      .schedule-container { flex: 0 0 38%; }
+    }
+
+    body.dark .container,
+    body.dark .schedule-container {
+      background: #2c2c2c;
+      color: white;
+    }
+
+    h1, h2 {
+      text-align: center;
+      margin-top: 0;
+    }
+
+    input, select, textarea, button {
+      padding: 12px;
+      font-size: 16px;
+      margin-bottom: 10px;
+      width: 100%;
+      box-sizing: border-box;
+      border-radius: 6px;
+      border: 1px solid #ccc;
+    }
+
+    button {
+      background: #4CAF50;
+      color: white;
+      border: none;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .hidden { display: none; }
+
+    li {
+      background: #e0f7fa;
+      margin-bottom: 10px;
+      padding: 10px;
+      border-radius: 6px;
+    }
+
+    .reminder-3 { border-left: 6px solid #ffeb3b; }
+    .reminder-2 { border-left: 6px solid #ff9800; }
+    .reminder-1 { border-left: 6px solid #f44336; }
+
+    body.dark li {
+      background: #37474f;
+    }
+
+    .done {
+      background: #c8e6c9;
+      text-decoration: line-through;
+    }
+
+    .task-actions button {
+      margin-right: 5px;
+      margin-top: 5px;
+    }
+
+    #search {
+      margin-top: 10px;
+    }
+
+    #stats {
+      margin-bottom: 10px;
+      font-weight: bold;
+    }
+
+    ul {
+      padding-left: 20px;
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-size: 12px;
+      margin-top: 5px;
+    }
+
+    .badge.done {
+      background: #81c784;
+      color: white;
+    }
+
+    .badge.todo {
+      background: #e57373;
+      color: white;
+    }
+  </style>
+</head>
+<body>
+  <h1>TugasKu</h1>
+  <div id="datetime" style="text-align:center; font-weight:bold;"></div>
+  <div id="nav-buttons">
+    <button onclick="showPage('tugas')">Halaman Utama</button>
+    <button onclick="showPage('jadwal')">Jadwal Pelajaran</button>
+  </div>
+
+  <div class="main-layout">
+    <div class="container" id="page-tugas">
+      <button id="dark-mode-toggle">Ganti Tema</button>
+      <form id="task-form">
+        <select id="subject" required>
+          <option value="">-- Pilih Mata Pelajaran --</option>
+        </select>
+        <input type="text" id="task-name" placeholder="Tulis tugas" required>
+        <textarea id="task-note" placeholder="Catatan tambahan (opsional)"></textarea>
+        <label id="deadline-label" for="task-deadline">Dikumpulkan pada:</label>
+        <input type="date" id="task-deadline" required>
+        <input type="text" id="surah" class="hidden" placeholder="Nama Surah">
+        <input type="text" id="ayat" class="hidden" placeholder="Ayat">
+        <label id="last-setor-label" class="hidden" for="last-setor">Terakhir setoran:</label>
+        <input type="date" id="last-setor" class="hidden">
+        <button type="submit">Tambah Tugas</button>
+      </form>
+
+      <input type="text" id="search" placeholder="Cari tugas...">
+      <div id="stats"></div>
+      <p id="motivation">
+      Haii!! yaa ngerjain tugasnya! Jangan lupa berdoa <strong>sebelum</strong> nugas... biar tugasnya jadi <em>"berkah"</em>. 
+      Kalau kamu capek, coba kerjain satu per satu dulu aja dan tetap enjoy, jangan dibawa pikiran. Tetap fokus ya! 
+    </p>
+    
+    <p id="motivation">
+      Kamu juga bisa support creator dengan follow sosial media ini <strong><em>@sharif_daop1</em></strong>
+    </p>
+        
+    <p id="motivation">
+[ <em>Kalo kamu merasa <strong><em>Tampilan Pengguna</em></strong> dan <strong><em>Fitur-fitur</em></strong> disini masih ada yang kurang, Kamu bisa kasih saran langsung aja, soalnya ini project pertama creator wkwk.. Jadi harap maklumi yaa :)</em> ]
+    </p>
+    
+    <p id="motivation">
+     <strong>● Keterangan warna list disamping tugas :</strong>
+    </p>
+     <p id="motivation">
+      <strong>• Kuning</strong> = Deadline tinggal 3 hari lagi! Jangan lupa kerjain yaa!
+    </p>
+    <p id="motivation">
+        <strong>• Oranye</strong> = Tinggal 2 hari lagi, Ayo buruan kerjain! jangan sampai kelupaan!
+        </p>
+        <p id="motivation">
+       <strong>• Merah</strong> = Deadline tinggal 1 hari! Kerjain sekarang juga ga!
+        </p>
+      <ul id="task-list"></ul>
+    </div>
+
+    <div class="schedule-container" id="page-jadwal" style="display: none;">
+      <h2>Jadwal Pelajaran</h2>
+      <div id="schedule"></div>
+    </div>
+  </div>
+
+<script>
+  const form = document.getElementById("task-form");
+  const subjectInput = document.getElementById("subject");
+  const taskName = document.getElementById("task-name");
+  const taskDeadline = document.getElementById("task-deadline");
+  const taskNote = document.getElementById("task-note");
+  const surahInput = document.getElementById("surah");
+  const ayatInput = document.getElementById("ayat");
+  const lastSetorInput = document.getElementById("last-setor");
+  const deadlineLabel = document.getElementById("deadline-label");
+  const lastSetorLabel = document.getElementById("last-setor-label");
+  const taskList = document.getElementById("task-list");
+  const darkToggle = document.getElementById("dark-mode-toggle");
+  const searchInput = document.getElementById("search");
+  const stats = document.getElementById("stats");
+  const scheduleContainer = document.getElementById("schedule");
+
+  const subjects = [
+    "Matematika Minat", "Matematika Wajib", "Fisika", "Kimia", "PKWU",
+    "Bahasa Inggris Wajib", "Bahasa Inggris Tingkat Lanjut", "Bahasa Indonesia", "Bahasa Arab",
+    "Al-Qur'an Hadist", "Tahfidz", "Fikih", "Akidah Akhlak", "SKI", "Sejarah Indonesia",
+    "PKN", "BK", "Seni Budaya", "PJOK"
+  ];
+
+  const schedule = {
+    "Senin": ["Matematika Minat", "Fisika", "Bahasa Arab", "Fikih", "Akidah Akhlak"],
+    "Selasa": ["Al-Qur'an Hadist", "Tahfidz", "Bahasa Indonesia", "Fisika", "PJOK"],
+    "Rabu": ["Fisika", "Bahasa Inggris Tingkat Lanjut", "PKN", "Seni Budaya", "Matematika Minat"],
+    "Kamis": ["Kimia", "BK", "Matematika Wajib", "Sejarah Indonesia", "SKI"],
+    "Jumat": ["Bahasa Inggris Tingkat Lanjut", "PKWU", "Bahasa Inggris Wajib", "Kimia"]
+  };
+
+  subjects.forEach(s => {
+    subjectInput.innerHTML += `<option value="${s}">${s}</option>`;
+  });
+
+  function renderSchedule() {
+    scheduleContainer.innerHTML = "";
+    for (let day in schedule) {
+      let daySchedule = `<strong>${day}</strong><ul>`;
+      schedule[day].forEach(sub => {
+        daySchedule += `<li>${sub}</li>`;
+      });
+      daySchedule += "</ul>";
+      scheduleContainer.innerHTML += daySchedule;
+    }
+  }
+
+  subjectInput.addEventListener("change", () => {
+    const isTahfidz = subjectInput.value === "Tahfidz";
+    surahInput.classList.toggle("hidden", !isTahfidz);
+    ayatInput.classList.toggle("hidden", !isTahfidz);
+    lastSetorInput.classList.toggle("hidden", !isTahfidz);
+    lastSetorLabel.classList.toggle("hidden", !isTahfidz);
+    deadlineLabel.innerText = isTahfidz ? "Setor lagi:" : "Dikumpulkan pada:";
+  });
+
+  if (localStorage.getItem("darkMode") === "true") {
+    document.body.classList.add("dark");
+  }
+
+  darkToggle.addEventListener("click", () => {
+    document.body.classList.toggle("dark");
+    localStorage.setItem("darkMode", document.body.classList.contains("dark"));
+  });
+
+  let tasks = JSON.parse(localStorage.getItem("tasks")) || [];
+
+  function saveTasks() {
+    localStorage.setItem("tasks", JSON.stringify(tasks));
+  }
+
+  form.addEventListener("submit", function(e) {
+    e.preventDefault();
+    const subject = subjectInput.value;
+    const isTahfidz = subject === "Tahfidz";
+
+    if (!subject || !taskName.value || !taskDeadline.value) {
+      alert("Harap lengkapi semua field wajib.");
+      return;
+    }
+
+    if (new Date(taskDeadline.value) < new Date().setHours(0, 0, 0, 0)) {
+      alert("Tanggal deadline tidak boleh di masa lalu.");
+      return;
+    }
+
+    if (isTahfidz && (!surahInput.value || !ayatInput.value)) {
+      alert("Harap isi nama surah dan ayat untuk tugas Tahfidz.");
+      return;
+    }
+
+    const task = {
+      id: Date.now(),
+      subject,
+      name: taskName.value,
+      note: taskNote.value,
+      deadline: taskDeadline.value,
+      surah: isTahfidz ? surahInput.value : "",
+      ayat: isTahfidz ? ayatInput.value : "",
+      lastSetor: isTahfidz ? lastSetorInput.value : "",
+      done: false
+    };
+
+    tasks.push(task);
+    saveTasks();
+    form.reset();
+    subjectInput.dispatchEvent(new Event("change"));
+    renderTasks();
+  });
+
+  function renderTasks() {
+    const keyword = searchInput.value.toLowerCase();
+    taskList.innerHTML = "";
+    const now = new Date();
+
+    const sortedTasks = [...tasks].sort((a, b) => new Date(a.deadline) - new Date(b.deadline));
+    const filteredTasks = sortedTasks.filter(task => task.name.toLowerCase().includes(keyword));
+
+    let doneCount = 0;
+
+    filteredTasks.forEach(task => {
+      const li = document.createElement("li");
+      const isTahfidz = task.subject === "Tahfidz";
+      const deadline = new Date(task.deadline);
+      const diffDays = Math.ceil((deadline - now) / (1000 * 60 * 60 * 24));
+
+      if (task.done) doneCount++;
+
+      if (!task.done && diffDays <= 3 && diffDays >= 1) {
+        li.classList.add(`reminder-${diffDays}`);
+      }
+
+      const deadlineText = isTahfidz ? `Setor lagi: ${task.deadline}` : `Dikumpulkan pada: ${task.deadline}`;
+      const lastSetoran = isTahfidz && task.lastSetor ? `Terakhir setoran: ${task.lastSetor}` : "";
+      const progres = isTahfidz ? `Progres hafalan: ${task.surah} ayat ${task.ayat}` : "";
+      const statusBadge = `<span class="badge ${task.done ? 'done' : 'todo'}">${task.done ? 'Selesai' : 'Belum'}</span>`;
+
+      li.innerHTML = `
+        <strong>${task.subject}</strong>: ${task.name}<br>
+        ${deadlineText}<br>
+        ${task.note ? `Catatan: ${task.note}<br>` : ""}
+        ${isTahfidz ? `${lastSetoran}<br>${progres}<br>` : ""}
+        ${statusBadge}
+        <div class="task-actions">
+          <button onclick="toggleDone(${task.id})">${task.done ? "Tandai Belum" : "Tandai Selesai"}</button>
+          <button onclick="deleteTask(${task.id})">Hapus</button>
+        </div>
+      `;
+      if (task.done) li.classList.add("done");
+      taskList.appendChild(li);
+    });
+
+    stats.innerHTML = `Tugas selesai: ${doneCount} / ${tasks.length}`;
+  }
+
+  function toggleDone(id) {
+    const task = tasks.find(t => t.id === id);
+    if (task) task.done = !task.done;
+    saveTasks();
+    renderTasks();
+  }
+
+  function deleteTask(id) {
+    tasks = tasks.filter(t => t.id !== id);
+    saveTasks();
+    renderTasks();
+  }
+
+  function showPage(page) {
+    document.getElementById("page-tugas").style.display = page === "tugas" ? "block" : "none";
+    document.getElementById("page-jadwal").style.display = page === "jadwal" ? "block" : "none";
+  }
+
+  searchInput.addEventListener("input", renderTasks);
+
+  renderSchedule();
+  renderTasks();
+</script>
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
+    const tgl = now.toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    const jam = now.toLocaleTimeString('id-ID');
+
+    document.getElementById('datetime').textContent = `${hari}, ${tgl} - ${jam}`;
+  }
+</script>
+<script>
+  function updateDateTime() {
+    const now = new Date();
+    const hari = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'][now.getDay()];
+    const tgl = now.toLocaleDateString('id-ID', {
+      day: 'numeric', month: 'long', year: 'numeric'
+    });
+    const jam = now.toLocaleTimeString('id-ID');
+
+    document.getElementById('datetime').textContent = `${hari}, ${tgl} - ${jam}`;
+  }
+
+  // Panggil fungsi saat halaman dibuka
+  updateDateTime();
+
+  // Perbarui setiap detik
+  setInterval(updateDateTime, 1000);
+</script>
+</body>
+</html>
